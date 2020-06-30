@@ -1,5 +1,4 @@
-var r = require('./wrabbity');
-const rabbitMQServer = 'localhost';
+var wrabbity = require('./wrabbity');
 
 
 
@@ -26,7 +25,7 @@ r.EventPublisher().receiver('hello');
 
 async function ServerSimulator() {
 
-    //let r = new rabbit();
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
     await r.ready;
 
     r.taskResponse('test', 'test', 'test_queue', {resp : 'nidhaloff'});

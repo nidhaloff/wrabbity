@@ -1,6 +1,5 @@
-const rabbitMQServer = 'amqp://evallx033.emea.porsche.biz:5672';
-const amqp = require('amqplib');
-var r = require('./IRabbitMQ');
+
+var wrabbity = require('./wrabbity');
 
 
 
@@ -14,10 +13,10 @@ var r = require('./IRabbitMQ');
 
 async function ClientSimulator() {
 
-    //let r = new rabbit();
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
     await r.ready;
     r._requestListener = (msg, corr) => {
-        console.log("request listener überschreiben");
+        console.log("request listener overriding");
     }
     r.taskRequest('test', 'test','request from nidhal',r._requestListener);
 }

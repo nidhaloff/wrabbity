@@ -1,15 +1,20 @@
 
-const rabbitMQServer = 'localohst or host for your server'; 
 const amqplib = require('./node_modules/amqplib'); // amqplib is the Bibliothek that implement the AMQP Protocol
-const uuid = require('./node_modules/uuid/v4'); // lightweight library to generate a uuid 
+const { v4: uuidv4 } = require('uuid'); // lightweight library to generate a uuid 
 const _ = require('./node_modules/lodash'); // Library with Some useful functions to validate Types
 const validateHost = require('./node_modules/is-url'); // library to validate host/url types
 
-class IRabbitMQ {
+class Wrabbity {
 
-    constructor() {
-
-      this.ready = this.init(rabbitMQServer);
+    constructor(rabbitMqServer=null) {
+        
+      if (rabbitMqServer) {
+        this.ready = this.init(rabbitMqServer);
+      
+      }
+      else{
+          throw new Error('rabbitmq host is wrong')
+      }  
       
     }
 
@@ -136,7 +141,7 @@ class IRabbitMQ {
         */
        //#endregion
 
-       let corr = uuid();
+       let corr = uuidv4();
        let ex = clientName + 'rpc';
       
        channel.assertExchange(ex, 'direct', {durable : true});
@@ -339,7 +344,7 @@ class IRabbitMQ {
        if(!_.isObjectLike(ack_options))  throw new Error('acknowledgments Options must be wrapped in an Object'); 
        //#endregion
         
-        let corr = uuid();
+        let corr = uuidv4();
        // console.log(this.isUUID(corr));
 
         let requestListener = _requestListener;
@@ -393,7 +398,7 @@ class IRabbitMQ {
   }
 
   
-module.exports = new IRabbitMQ(); // Export the Module so that we can use it in other files
+module.exports = Wrabbity; // Export the Module so that we can use it in other files
 
 
 
