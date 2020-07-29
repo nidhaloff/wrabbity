@@ -1,8 +1,8 @@
 
 const amqplib = require('./node_modules/amqplib'); // amqplib is the Bibliothek that implement the AMQP Protocol
 const { v4: uuidv4 } = require('uuid'); // lightweight library to generate a uuid 
-const _ = require('./node_modules/lodash'); // Library with Some useful functions to validate Types
-const validateHost = require('./node_modules/is-url'); // library to validate host/url types
+
+
 
 class Wrabbity {
 
@@ -13,16 +13,16 @@ class Wrabbity {
       
       }
       else{
-          throw new Error('rabbitmq host is wrong')
+          throw new Error('You must provide the rabbitmq host');
       }  
       
     }
 
     // close connection with rabbitmq
-    closeConnection(connection = this.connection) {
-
-        connection.closeConnection();
-    }
+    async close() {
+        if (this.channel) await this.channel.close();
+        await this.connection.close();
+      }
   
     // initialize Connection and open Channel with rabbitmq
     async init(host) {
@@ -33,7 +33,7 @@ class Wrabbity {
         */
        //#endregion
       
-       if (!validateHost(host)) {
+       if (!host) {
 
             throw new Error('Invalid Host Format of RabbitMQ');
        }
@@ -46,7 +46,7 @@ class Wrabbity {
 
         channel.prefetch(1);
 
-        console.log(' [x] Awaiting RPC requests');
+        //console.log(' [x] Awaiting RPC requests');
 
         this.connection = connection; 
   
@@ -253,16 +253,6 @@ class Wrabbity {
           
         */
        //#endregion
-       
-       //#region Format of Parameters Description
-        if(!_.isString(executerName))  throw new Error('executer Name should be a String Type');
-        if(!_.isString(routingKey))  throw new Error('routingKey should be a String Type');   
-        if(!_.isString(consumeQueue))  throw new Error('consumeQueue should be a String Type'); 
-        if(!_.isFunction(_responseListener))  throw new Error('response Listener must be a Function'); 
-        if(!_.isFunction(_sendReturn))  throw new Error('send Return must be a Function'); 
-        if(!_.isObjectLike(qOptions))  throw new Error('queue Options must be wrapped in an Object'); 
-        if(!_.isObjectLike(ack_options))  throw new Error('acknowledgments Options must be wrapped in an Object'); 
-        //#endregion
       
         let ex = executerName + '_tasks';
         
@@ -291,7 +281,7 @@ class Wrabbity {
     // this function will be fired as Event when a taskExecuter will consume a Request => define your own function before calling taskResponse and passing this function as an argument
     _responseListener() {
  
-        console.log("msg received and a response Event can be fired");
+        console.log("msg received and a response can be sent back");
     
     }
 
@@ -305,11 +295,7 @@ class Wrabbity {
             -response : response we want to send back to the Requester
         */
        //#endregion
-     
-        //#region Format of Parameters Description
-        if(!_.isObject(response) && !_.isString(response))  throw new Error('response should be a String, Object or JSON Format');
-        //#endregion
-       
+
         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(response)), {correlationId: msg.properties.correlationId});
                 
         //channel.ack(msg); // if we want to acknowledge the messages than we must uncomment this
@@ -334,16 +320,6 @@ class Wrabbity {
         */
        //#endregion
 
-       //#region Format of Parameters Description
-       if(!_.isString(executerName))  throw new Error('executer Name should be a String Type');
-       if(!_.isString(routingKey))  throw new Error('routingKey should be a String Type');   
-       if(!_.isString(request) && !_.isObject(request))  throw new Error('request should be a String, Object or JSON Format'); 
-       if(!_.isFunction(_requestListener))  throw new Error('_requestListener must be a Function'); 
-       if(!_.isString(replyToQueue))  throw new Error('replyToQueue must be a String Type'); 
-       if(!_.isObjectLike(qOptions))  throw new Error('queue Options must be wrapped in an Object'); 
-       if(!_.isObjectLike(ack_options))  throw new Error('acknowledgments Options must be wrapped in an Object'); 
-       //#endregion
-        
         let corr = uuidv4();
        // console.log(this.isUUID(corr));
 
