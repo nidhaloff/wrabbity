@@ -1,15 +1,20 @@
 ![npm](https://img.shields.io/npm/v/wrabbity)
 ![GitHub package.json dynamic](https://img.shields.io/github/package-json/keywords/nidhaloff/wrabbity)
-![npm](https://img.shields.io/npm/dm/wrabbity)
+![npm](https://img.shields.io/npm/dw/wrabbity)
 ![NPM](https://img.shields.io/npm/l/wrabbity)
 [![Donate](https://img.shields.io/badge/$-support-ff69b4.svg?style=flat)](https://www.buymeacoffee.com/nidhaloff?new=1)  
 [![https://twitter.com/NidhalBaccouri](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&style=plastic)]()
   
-**-RabbitMQ without headache:**
+**RabbitMQ without headache:**
 
 The wrabbity is a wrapper interface for Rabbitmq communication patterns to make it abstracter and easier to use the these in a Complex Project.
 
-**-Why you should use this:**
+The wrabbity package is a RabbitMq Interface on top of amqplib to make implementing RabbitMQ messaging patterns easier. It is very useful especially inside large projects, in which many boilerplate code must be written. 
+
+It uses a parent wrapper class that wrap all connections and classes definitions of different messaging patterns. Furthermore, it uses async/await syntax to improve code readability and to asynchronously orchestrate between multiple subscription and RPCs.
+
+**Introduction**
+
 If you are working on a big complex project, where you are using rabbitmq (or actually any broker), you know the pain of how hard it can get to maintain your code.
 
 In fact, you must write boilerplate code to use AMQP or MQTT patterns like publish-subscribe, rpc, working queues etc.. 
@@ -18,42 +23,265 @@ Therefore the wrabbity package is ideal for you since it provide a high level AP
 
 I implemented the library at work and I use it inside projects based on microservices. So feel free to use it and give me any feedback. You can always get in touch with me :)
 
-**- Installation:**
+**Why you should use this:**
+
+- Async/await syntax based package
+- Stable
+- Easy to learn and get to work with
+- Extendable
+- High level API
+- Scalable (since it reuses connection and channels)
+
+
+
+**Installation:**
+```javascript
     
-    `npm install wrabbity`
+    npm install wrabbity
+    
+```
 
+**Getting Started:**
 
+My goal is to wrap all rabbitmq patterns in a class, where all work can be organised perfectly within the class wrapper. 
 
-**- Getting Started:**
+Here is a quick demo
+
+```javascript
 
     // first require the wrabbity class
-     `var rabbit = require(./wrabbity.js);
-  
+    const wrabbity = require(./wrabbity.js);
 
-*****the amqp Library is asynchronous implemented, that means
-we can use the wrabbity API only inside an async function (examples are in the test files).
+ 
+    async function myMainFunction(){ 
+        
+        const rabbit = new wrabbit('amqp://localhost')
+        await rabbit.ready; // here the magic is done in the background
 
-Hence, an async function should be created where you want to use the Instance of the Wrabbity class and inside that function*****
+        /*
 
-    `async function myMainFunction(){ 
-        // here call first the ready function that will initialize the connection and channel with rabbitmq:
-        var rabbit = wrabbity('your_rabbitmq_host)
-        await rabbit.ready; // the magic happens here. All boilerplate code will be managed by wrabbity
-        /* 
-        all done. now just do what you gotta do, you can access all the goody functions with the rabbit instance ;)
+            Do what you want to do
+
         */
-    }`
+    }
 
-other examples can be found in testClient.js and testServer.js files
+  
+```
+
+*Explanation*: I know you are probably confused now. Especially if you are a begineer (like me when I started working with rabbitmq). What I want to tell you is **don't worry**. 
+
+So what is happening above in the code?
+
+- The wrabbity package is required (I assume we all know what this means)
+- Wrabbity is implemented async. Hence the `await rabbit.ready` is initializing a connection and channel in the background, which will be reused to save resources and ensure fast messaging.
+- Afterwards, you can do everything you want with the rabbit class. You can think about this as your main class, in which all rabbitmq messaging patterns are implemented. For instance, simple send-receive, working queues, publish-subscribe and remote procedure calls (RPC)
+
+Just give it a try. I'm using the library at work, where I develop microservices and I must say I improved the code quality, readability and accelerate the development when I switched to using wrabbity.
+
+**Basic Usage**
+
+- Send a message:
+
+
+```javascript
+
+const wrabbity = require('wrabbity');
+
+
+async function send() {
+
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
+    await r.ready;
+    r.sender(queue='test_queue1', message="msg from sender");
+}
+
+send();
+
+```
+
+- receive a message:
+
+```javascript
+
+const wrabbity = require('wrabbity');
+
+
+async function receive() {
+
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
+    await r.ready;
+
+    r.receiver(queue="test_queue1", (msg) => {
+
+        console.log("received msg: ", msg.content.toString())
+        // do something with the msg ..
+    });
+}
+
+receive();
+
+```
+> **_NOTE:_**  The sender and receiver are basic usage of rabbitmq messaging patterns, where the sender sends a message to a queue and the receiver connects to the queue and consumes the msg. I recommend you to read further the tutorial https://www.rabbitmq.com/getstarted.html
+
+**Usual Usage**
+
+- Publisher:
+
+```javascript
+
+    const wrabbity = require('../../wrabbity');
+
+    async function publishSimulator() {
+
+        let r = new wrabbity(rabbitMqServer='amqp://localhost');
+        await r.ready; // the magic is done for you here
+
+        // now it's time to publish a msg to a subscriber through rabbitmq
+        r.eventPublisher(publisherName="tester", 
+        routingKey="test", 
+        message="msg from publisher");
+    }
+
+    publishSimulator();
+
+```
+
+- You can also use the async syntax for the function:
+
+```javascript
+
+    const wrabbity = require('../../wrabbity');
+
+    publishSimulator = async () => {
+
+        let r = new wrabbity(rabbitMqServer='amqp://localhost');
+        await r.ready; // the magic is done for you here
+
+        // now it's time to publish a msg to a subscriber through rabbitmq
+        r.eventPublisher(publisherName="tester", 
+        routingKey="test", 
+        message="msg from publisher");
+    }
+
+    publishSimulator();
+
+```
+
+- Subscriber:
+
+```javascript
+
+
+const wrabbity = require('../../wrabbity');
+
+async function subscribeSimulator() {
+
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
+    await r.ready;
+
+    // The callback function will be called if the subscriber received a msg. Notice that the function takes the actual msg as an argument in order to let you do what you want with the msg when you consume it. (for example you can store in a database or whatever you want to do..)
+    const callback = (msg) => {
+        console.log(`received this event: ${msg.content.toString()}`);
+    }
+
+    r.eventSubscriber(subscriberName="tester", 
+    routingKey="test", 
+    _eventListener=callback);
+}
+
+subscribeSimulator();
+
+```
+
+> **_NOTE:_**  Hopefully, you noticed until now what the wrabbity package is doing. The eventPublisher and eventSubscriber function make it abstracter for you to use the messaging pattern without rewriting much code. Besides, it is faster and efficient since it reuses the connection and channels ;)
+
+**Advanced Usage**
+
+- RPC Requester (Client):
+
+The requester or client is a the component responsible for sending a request over rabbitmq and waiting for the response to come from the server (or rpc server). This is somehow an advanced usage but I'm putting an example of it to show you the capabilities of the wrabbity package.
+
+```javascript
 
 
 
-**- Test of Functionality:**
+const wrabbity = require('wrabbity');
 
-in this Folder, testClient and testServer are files for testing the functionality of the wrabbity Interface. testClient represents the Client side
+async function ClientSimulator() {
+
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
+    await r.ready;
+
+    // the callback function in the requester must receive the msg (response) and the corr (correlation ID) in order to check if the msg comes from the expected source.
+    const callback = async (msg, corr) => {
+        console.log(`received ${msg.content.toString()} with the coorelation id: ${corr}`);
+    }
+    
+    // now as always just a one liner to send a request
+    await r.taskRequest(executerName="executer", 
+                        routingKey="test", 
+                        request='request from client', 
+                        _requestListener=callback);
+}
+
+ClientSimulator();
+
+```
+
+- RPC Responser (Server):
+
+The server is responsible for consuming the client msg from the queue and send back a response based on it.
+
+```javascript
+
+const wrabbity = require('wrabbity');
+
+
+async function ServerSimulator() {
+
+    let r = new wrabbity(rabbitMqServer='amqp://localhost');
+    await r.ready; // the magic happens here so that you get straight to make your thing and avoid boilerplate code
+    
+    // payload to send back to the client
+    const payload = "this is the response";
+
+
+    const callback = (msg, response) => {
+        console.log(`msg: ${msg.content.toString()} | response that will be send back: ${response}`);
+        console.log("received request successfully");
+    }
+    r.taskResponse(executerName="executer", 
+                    routingKey="test", 
+                    consumeQueue="test_queue", 
+                    response=payload, 
+                    _responseListener=callback);
+}
+
+
+ServerSimulator();
+
+```
+> **_NOTE:_**  As you have seen until now. All rabbitmq messaging patterns are wrapped in a one liner function using the wrabbity package. Pretty easy right?
+
+**Examples**
+
+in the examples Folder, testClient and testServer are files for testing the functionality of the wrabbity Interface. testClient represents the Client side
 that is responsible to send simple Messages, publish as well subscribe to Events or send Requests and wait for Responses. on the other Side, the Server is responsible 
 to receive messages, publish as well subscribe to Events and receive Requests and based of this it will send back Responses.
 
-**- More Usage Examples**
+You can play around with the examples and test the functionality. The examples are divided in three folders, where one folder contains examples for a messaging pattern.
 
-check the for examples folder to know how to implement messaging patterns.
+- send and receive
+- publish and subscribe
+- RPC
+
+**Links**
+
+Rabbitmq Tutorials
+
+https://www.rabbitmq.com/getstarted.html
+
+**Contributions**
+
+Contributions are always welcome. Feel free to make a pull request.
+Please let me now if you find the package useful or if you are having any problem understanding what is happening :)

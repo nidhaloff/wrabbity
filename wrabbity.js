@@ -78,7 +78,7 @@ class Wrabbity {
     }
 
     // basic function receiver => this will receive a Message from a queue (there is no exchange middleware) based on queue name. queue options will describe if the queue will be durable, exclusive etc.. it is set to a default value
-    async receiver(queue, qOptions = {durable: false}, ack_options = {noAck : true} ) {
+    async receiver(queue, callback, qOptions = {durable: false}, ack_options = {noAck : true} ) {
          //#region  parameter Description:
          /*
             -queue : the queue we want to receive the message from it
@@ -90,8 +90,8 @@ class Wrabbity {
          await this.channel.assertQueue(queue, qOptions);
 
         await this.channel.consume(queue, function (msg) {
-
-        console.log(" [x] Received %s", msg.content.toString());
+            
+        callback(msg);
 
       }, ack_options);
     }
@@ -270,7 +270,7 @@ class Wrabbity {
 
         await channel.consume(q.queue, msg=> { // consume msg from that exchange according to some Parameters 
         
-            responseListener();
+            responseListener(msg, response);
 
             returnResponseToRequester(channel, msg, res);
 
@@ -279,7 +279,7 @@ class Wrabbity {
     }
 
     // this function will be fired as Event when a taskExecuter will consume a Request => define your own function before calling taskResponse and passing this function as an argument
-    _responseListener() {
+    _responseListener(msg, response) {
  
         console.log("msg received and a response can be sent back");
     
@@ -296,6 +296,7 @@ class Wrabbity {
         */
        //#endregion
 
+        //this._responseListener(msg, response);
         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(response)), {correlationId: msg.properties.correlationId});
                 
         //channel.ack(msg); // if we want to acknowledge the messages than we must uncomment this
