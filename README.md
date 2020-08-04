@@ -4,8 +4,10 @@
 [![Donate](https://img.shields.io/badge/$-support-ff69b4.svg?style=flat)](https://www.buymeacoffee.com/nidhaloff?new=1)
 [![https://twitter.com/NidhalBaccouri](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&style=plastic)]()
   
-  
-**RabbitMQ without headache:**
+A modern simple tool that provides a high level API to work with RabbitMQ
+
+RabbitMQ without headache
+==========================
 
 The wrabbity is a wrapper interface for Rabbitmq communication patterns to make it abstracter and easier to use the these in a Complex Project.
 
@@ -13,7 +15,18 @@ The wrabbity package is a RabbitMq Interface on top of amqplib to make implement
 
 It uses a parent wrapper class that wrap all connections and classes definitions of different messaging patterns. Furthermore, it uses async/await syntax to improve code readability and to asynchronously orchestrate between multiple subscription and RPCs.
 
-**Introduction**
+Inspiration
+------------
+
+This project is inspired from the python  [**b_rabbit**](https://github.com/nidhaloff/b_rabbit) package, which I created at work. 
+
+Basically, the goal of the project is to provide a high level thread safe API to interface with rabbitmq.
+
+We needed afterwards to switch from python to nodejs and the rest is .. creation of **wrabbity**
+
+
+Introduction
+------------
 
 If you are working on a big complex project, where you are using rabbitmq (or actually any broker), you know the pain of how hard it can get to maintain your code.
 
@@ -23,7 +36,8 @@ Therefore the wrabbity package is ideal for you since it provide a high level AP
 
 I implemented the library at work and I use it inside projects based on microservices. So feel free to use it and give me any feedback. You can always get in touch with me :)
 
-**Why you should use this:**
+Why you should use this
+------------------------
 
 - Async/await syntax based package
 - Stable
@@ -34,14 +48,17 @@ I implemented the library at work and I use it inside projects based on microser
 
 
 
-**Installation:**
+Installation
+-------------
+
 ```javascript
     
     npm install wrabbity
     
 ```
 
-**Getting Started:**
+Getting Started
+---------------
 
 My goal is to wrap all rabbitmq patterns in a class, where all work can be organised perfectly within the class wrapper. 
 
@@ -68,7 +85,9 @@ Here is a quick demo
   
 ```
 
-*Explanation*: I know you are probably confused now. Especially if you are a begineer (like me when I started working with rabbitmq). What I want to tell you is **don't worry**. 
+**Explanation**: 
+
+I know you are probably confused now. Especially if you are a begineer (like me when I started working with rabbitmq). What I want to tell you is **don't worry**. 
 
 So what is happening above in the code?
 
@@ -78,7 +97,8 @@ So what is happening above in the code?
 
 Just give it a try. I'm using the library at work, where I develop microservices and I must say I improved the code quality, readability and accelerate the development when I switched to using wrabbity.
 
-**Basic Usage**
+Basic Usage
+------------
 
 - Send a message:
 
@@ -123,7 +143,8 @@ receive();
 ```
 > **_NOTE:_**  The sender and receiver are basic usage of rabbitmq messaging patterns, where the sender sends a message to a queue and the receiver connects to the queue and consumes the msg. I recommend you to read further the tutorial https://www.rabbitmq.com/getstarted.html
 
-**Usual Usage**
+Usual Usage
+------------
 
 - Publisher:
 
@@ -195,7 +216,8 @@ subscribeSimulator();
 
 > **_NOTE:_**  Hopefully, you noticed until now what the wrabbity package is doing. The eventPublisher and eventSubscriber function make it abstracter for you to use the messaging pattern without rewriting much code. Besides, it is faster and efficient since it reuses the connection and channels ;)
 
-**Advanced Usage**
+Advanced Usage
+---------------
 
 - RPC Requester (Client):
 
@@ -263,7 +285,8 @@ ServerSimulator();
 ```
 > **_NOTE:_**  As you have seen until now. All rabbitmq messaging patterns are wrapped in a one liner function using the wrabbity package. Pretty easy right?
 
-**Examples**
+Examples
+---------
 
 in the examples Folder, testClient and testServer are files for testing the functionality of the wrabbity Interface. testClient represents the Client side
 that is responsible to send simple Messages, publish as well subscribe to Events or send Requests and wait for Responses. on the other Side, the Server is responsible 
@@ -275,13 +298,16 @@ You can play around with the examples and test the functionality. The examples a
 - publish and subscribe
 - RPC
 
-**Links**
+Links
+-----
 
 Rabbitmq Tutorials
 
 https://www.rabbitmq.com/getstarted.html
 
-**Contributions**
+Contributions
+--------------
 
-Contributions are always welcome. Feel free to make a pull request.
+Contributions are always welcome. Feel free to make a pull request. I would appreciate it if you star the github repo so that others notice it.
+
 Please let me now if you find the package useful or if you are having any problem understanding what is happening :)
