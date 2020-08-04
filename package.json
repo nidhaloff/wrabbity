@@ -1,6 +1,6 @@
 {
   "name": "wrabbity",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "a node package that provides a simple API for interfacing with RabbitMq",
   "main": "wrabbity.js",
   "scripts": {
@@ -17,8 +17,16 @@
     "SOA",
     "Messaging-queue",
     "queue",
-    "brokers"
+    "brokers",
+    "publish-subscribe",
+    "remote procedure call",
+    "publish",
+    "subscribe"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nidhaloff/wrabbity"
+  },
   "author": "Nidhal Baccouri",
   "license": "MIT",
   "dependencies": {

@@ -1,9 +1,9 @@
 ![npm](https://img.shields.io/npm/v/wrabbity)
-![GitHub package.json dynamic](https://img.shields.io/github/package-json/keywords/nidhaloff/wrabbity)
 ![npm](https://img.shields.io/npm/dw/wrabbity)
 ![NPM](https://img.shields.io/npm/l/wrabbity)
-[![Donate](https://img.shields.io/badge/$-support-ff69b4.svg?style=flat)](https://www.buymeacoffee.com/nidhaloff?new=1)  
+[![Donate](https://img.shields.io/badge/$-support-ff69b4.svg?style=flat)](https://www.buymeacoffee.com/nidhaloff?new=1)
 [![https://twitter.com/NidhalBaccouri](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&style=plastic)]()
+  
   
 **RabbitMQ without headache:**
 
