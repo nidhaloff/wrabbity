@@ -1,6 +1,8 @@
 {
   "name": "wrabbity",
   "version": "1.0.5",
+  "url": "https://github.com/nidhaloff/wrabbity/issues",
+  "email": "nidhalbacc@gmail.com",
   "description": "a node package that provides a simple API for interfacing with RabbitMq",
   "main": "wrabbity.js",
   "scripts": {

@@ -67,7 +67,7 @@ Here is a quick demo
 ```javascript
 
     // first require the wrabbity class
-    const wrabbity = require(./wrabbity.js);
+    const wrabbity = require('wrabbity.js');
 
  
     async function myMainFunction(){ 
@@ -150,7 +150,7 @@ Usual Usage
 
 ```javascript
 
-    const wrabbity = require('../../wrabbity');
+    const wrabbity = require('wrabbity');
 
     async function publishSimulator() {
 
@@ -171,7 +171,7 @@ Usual Usage
 
 ```javascript
 
-    const wrabbity = require('../../wrabbity');
+    const wrabbity = require('wrabbity');
 
     publishSimulator = async () => {
 
@@ -193,7 +193,7 @@ Usual Usage
 ```javascript
 
 
-const wrabbity = require('../../wrabbity');
+const wrabbity = require('wrabbity');
 
 async function subscribeSimulator() {
 
