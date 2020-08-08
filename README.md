@@ -60,7 +60,9 @@ Installation
 Getting Started
 ---------------
 
-My goal is to wrap all rabbitmq patterns in a class, where all work can be organised perfectly within the class wrapper. 
+My goal is to wrap all rabbitmq patterns in a wrapper, where all work can be organised perfectly within this wrapper. 
+
+For instance, you need to create a wrabbity object inside this "main" function and then just pass the wrabbity object to other functions.
 
 Here is a quick demo
 
@@ -69,7 +71,6 @@ Here is a quick demo
     // first require the wrabbity class
     const wrabbity = require('wrabbity.js');
 
- 
     async function myMainFunction(){ 
         
         const rabbit = new wrabbit('amqp://localhost')
@@ -97,6 +98,9 @@ So what is happening above in the code?
 
 Just give it a try. I'm using the library at work, where I develop microservices and I must say I improved the code quality, readability and accelerate the development when I switched to using wrabbity.
 
+> **_NOTE:_**  You don't need to create more than one wrabbity object. The goal of the package is to create just one wrabbity object, which holds the connection and channel that can be reused allover your porject.
+
+
 Basic Usage
 ------------
 
@@ -107,12 +111,21 @@ Basic Usage
 
 const wrabbity = require('wrabbity');
 
+function send(rabbit, queue, msg) {
+    rabbit.sender(queue, msg);
+}
 
-async function send() {
+function sendAnother(rabbit, queue, msg) {
+    rabbit.sender(queue, msg);
+}
+
+async function main() {
 
     let r = new wrabbity(rabbitMqServer='amqp://localhost');
     await r.ready;
-    r.sender(queue='test_queue1', message="msg from sender");
+    send(r, 'test_queue1', "msg from sender");
+    send(r, 'test_queue2', "another msg from sender");
+    
 }
 
 send();
@@ -125,22 +138,28 @@ send();
 
 const wrabbity = require('wrabbity');
 
+function receive(rabbit, queue, callback) {
+     rabbit.receiver(queue=queue, callback);
+}
 
-async function receive() {
+async function main() {
 
     let r = new wrabbity(rabbitMqServer='amqp://localhost');
     await r.ready;
-
-    r.receiver(queue="test_queue1", (msg) => {
+    receive(r, "test_queue1", (msg) => {
 
         console.log("received msg: ", msg.content.toString())
         // do something with the msg ..
     });
+   
 }
 
 receive();
 
 ```
+
+Notice how the wrabbity object is initialized only once in a "main" function and then it is passed to each function where it needs to be used. Reusing the object holding the connection and channel makes the wrabbity package efficient.
+
 > **_NOTE:_**  The sender and receiver are basic usage of rabbitmq messaging patterns, where the sender sends a message to a queue and the receiver connects to the queue and consumes the msg. I recommend you to read further the tutorial https://www.rabbitmq.com/getstarted.html
 
 Usual Usage
@@ -152,15 +171,30 @@ Usual Usage
 
     const wrabbity = require('wrabbity');
 
+    function publish(rabbit, publisherName, routingKey, msg) {
+            r.eventPublisher(publisherName, 
+            routingKey, 
+            message);
+
+    }
     async function publishSimulator() {
 
         let r = new wrabbity(rabbitMqServer='amqp://localhost');
         await r.ready; // the magic is done for you here
 
         // now it's time to publish a msg to a subscriber through rabbitmq
-        r.eventPublisher(publisherName="tester", 
-        routingKey="test", 
-        message="msg from publisher");
+       publisher(r, "tester", "test", "msg from publisher")
+
+       /*
+       you can reuse the wrabbity object and publish as many messages as you need over the same connection and channel which is very efficient
+       */
+      publisher(r, "tester1", "test1", "msg from publisher1")
+      publisher(r, "tester2", "test2", "msg from publisher2")
+      publisher(r, "tester3", "test3", "msg from publisher3")
+
+      /*
+        Hopefully, you can see now that you need to initialize the wrabbity connection and channel only once and then reuse it all over your project, which I' doing at work too.
+      */
     }
 
     publishSimulator();
@@ -195,19 +229,27 @@ Usual Usage
 
 const wrabbity = require('wrabbity');
 
+function subscribe(subscriberName, routingKey) {
+ let callback = (msg) => {
+        console.log(`received this event: ${msg.content.toString()}`);
+    }
+
+    rabbit.eventSubscriber(subscriberName, 
+    routingKey, 
+    callback=callback);
+
+}
 async function subscribeSimulator() {
 
     let r = new wrabbity(rabbitMqServer='amqp://localhost');
     await r.ready;
 
     // The callback function will be called if the subscriber received a msg. Notice that the function takes the actual msg as an argument in order to let you do what you want with the msg when you consume it. (for example you can store in a database or whatever you want to do..)
-    const callback = (msg) => {
-        console.log(`received this event: ${msg.content.toString()}`);
-    }
+   subscribe(r, "tester", "test");
 
-    r.eventSubscriber(subscriberName="tester", 
-    routingKey="test", 
-    callback=callback);
+   /*
+    you can further reuse the r instance of wrabbity and subscribe to many topics as you want.
+   */
 }
 
 subscribeSimulator();
@@ -298,7 +340,7 @@ Look at this example to know how to integrate all your functionality in one wrap
 
 ```javascript
 
-const wrabbity = require('../../wrabbity');
+const wrabbity = require('wrabbity');
 
 async function publishEvents(rabbit, publisherName, routingKey, msg) {
 
