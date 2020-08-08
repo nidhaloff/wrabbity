@@ -11,7 +11,7 @@ async function subscribeSimulator() {
     }
     r.eventSubscriber(subscriberName="tester", 
     routingKey="test", 
-    _eventListener=callback);
+    callback=callback);
 }
 
 subscribeSimulator();

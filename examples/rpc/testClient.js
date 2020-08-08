@@ -13,7 +13,7 @@ async function ClientSimulator() {
     await r.taskRequest(executerName="executer", 
                     routingKey="test", 
                     request='request from client', 
-                    _requestListener=callback);
+                    callback=callback);
 }
 
 ClientSimulator();

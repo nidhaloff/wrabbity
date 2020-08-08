@@ -13,11 +13,11 @@ async function ServerSimulator() {
         console.log(`msg: ${msg.content.toString()} and response: ${response}`);
         console.log("received request successfully");
     }
-    r.taskResponse(executerName="executer", 
+    await r.taskResponse(executerName="executer", 
                     routingKey="test", 
                     consumeQueue="test_queue", 
                     response=payload, 
-                    _responseListener=callback);
+                    callback=callback);
 }
 
 

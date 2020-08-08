@@ -207,7 +207,7 @@ async function subscribeSimulator() {
 
     r.eventSubscriber(subscriberName="tester", 
     routingKey="test", 
-    _eventListener=callback);
+    callback=callback);
 }
 
 subscribeSimulator();
@@ -243,7 +243,7 @@ async function ClientSimulator() {
     await r.taskRequest(executerName="executer", 
                         routingKey="test", 
                         request='request from client', 
-                        _requestListener=callback);
+                        callback=callback);
 }
 
 ClientSimulator();
@@ -276,7 +276,7 @@ async function ServerSimulator() {
                     routingKey="test", 
                     consumeQueue="test_queue", 
                     response=payload, 
-                    _responseListener=callback);
+                    callback=callback);
 }
 
 
@@ -284,6 +284,70 @@ ServerSimulator();
 
 ```
 > **_NOTE:_**  As you have seen until now. All rabbitmq messaging patterns are wrapped in a one liner function using the wrabbity package. Pretty easy right?
+
+Design principles
+-----------------
+
+For the sake of simplicity, I gave above examples of how to use each messaging pattern. However, notice how I always created a new function and initialized a connection. You will not do this in production when you work with wrabbity, simply because initializing a connection and channel everytime is expensive and will make performance worse.
+
+So keep in mind that these examples is meant to give you an overview of the project, but if you use wrabbity in production, you need to have only one wrabbity object (which hold your connection and channel) and simply reuse it over your project.
+
+**How to do that**
+
+Look at this example to know how to integrate all your functionality in one wrapper function and hence, reuse the wrabbity object or rather the initialized connection and channel created by wrabbity:
+
+```javascript
+
+const wrabbity = require('../../wrabbity');
+
+async function publishEvents(rabbit, publisherName, routingKey, msg) {
+
+    rabbit.eventPublisher(publisherName=publisherName, 
+    routingKey=routingKey, 
+    message=msg);
+}
+
+async function subscribeToEvents(rabbit, subscriberName, routingKey) {
+
+    let callback = (msg) => {
+        console.log(`received this event: ${msg.content.toString()}`);
+    }
+
+    rabbit.eventSubscriber(subscriberName=subscriberName, 
+    routingKey=routingKey, 
+    callback=callback);
+
+}
+
+async function productionExample() {
+
+    try {
+        let r = new wrabbity(rabbitMqServer='amqp://localhost');
+        await r.ready;
+
+    publishEvents(rabbit=r, publisherName='tester', routingKey='test', msg="hello from publisher");
+    subscribeToEvents(rabbit=r, subscriberName='tester', routingKey='test');
+
+    }
+
+    catch(err) {
+        console.log("error: ", err);
+    }
+    
+}
+
+productionExample().catch(err => {
+    console.log(err);
+})
+
+
+```
+
+You can see clearly that the wrabbity object is reused by giving it as an argument to other function you want to use. I use this design at work too and I'm happy with the results. 
+
+The encapsulation of the project functionality in one wrapper function gives me a great overview of what my code is doing.
+
+If you have any further question, you can always contact me on twitter or send me an email ;)
 
 Examples
 ---------

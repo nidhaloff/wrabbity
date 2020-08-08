@@ -189,7 +189,7 @@ class Wrabbity {
     }
 
     // Subscribe to a Publisher to consume Messages based on routing KEy 
-    async eventSubscriber(subscriberName, routingKey, _eventListener = this._eventListener, exchangeName = subscriberName+'_events', queueName = subscriberName+'_events', exchangeType = 'direct', qOptions= {exclusive : false, durable: true}, ack_options = {noAck : true}, channel = this.channel, connection = this.connection ) {
+    async eventSubscriber(subscriberName, routingKey, callback = this.callback, exchangeName = subscriberName+'_events', queueName = subscriberName+'_events', exchangeType = 'direct', qOptions= {exclusive : false, durable: true}, ack_options = {noAck : true}, channel = this.channel, connection = this.connection ) {
 
            //#region  parameter Description:
         /* 
@@ -206,8 +206,6 @@ class Wrabbity {
         */
        //#endregion
 
-        let eventListener = _eventListener;
-
         if(!connection) {
             
             throw new Error('you need to create an Instance ')
@@ -223,13 +221,13 @@ class Wrabbity {
 
         await channel.consume(subscribeQueue, msg => {
 
-            eventListener(msg);
+            callback(msg);
 
         }, ack_options);
     }
 
     // this function will be fired as an Event when a Subscriber received a Message from a Publisher
-    _eventListener(msg){
+    callback(msg){
 
         // do Something when the subscriber receive the message from the Publisher
         // example:
@@ -238,7 +236,7 @@ class Wrabbity {
     }
 
     // a taskExecuter function responsible of executing tasks => it can consume tasks and choose to raise an Event, send a Response or both
-    async taskResponse(executerName, routingKey, consumeQueue, response, _responseListener = this._responseListener, _sendReturn = this.sendReturn, channel = this.channel, qOptions= {exclusive : false}, ack_options = {noAck : true}) {
+    async taskResponse(executerName, routingKey, consumeQueue, response, callback = this.callback, sendReturn = this.sendReturn, channel = this.channel, qOptions= {exclusive : false}, ack_options = {noAck : true}) {
        
         //#region  parameter Description:
         /* 
@@ -256,9 +254,9 @@ class Wrabbity {
       
         let ex = executerName + '_tasks';
         
-        let responseListener = _responseListener;
+        // let responseListener = _responseListener;
 
-        let returnResponseToRequester = _sendReturn;
+        // let returnResponseToRequester = _sendReturn;
 
         let res = response;
 
@@ -270,16 +268,16 @@ class Wrabbity {
 
         await channel.consume(q.queue, msg=> { // consume msg from that exchange according to some Parameters 
         
-            responseListener(msg, response);
+            callback(msg, response);
 
-            returnResponseToRequester(channel, msg, res);
+            sendReturn(channel, msg, res);
 
             }, ack_options);
      
     }
 
     // this function will be fired as Event when a taskExecuter will consume a Request => define your own function before calling taskResponse and passing this function as an argument
-    _responseListener(msg, response) {
+    callback(msg, response) {
  
         console.log("msg received and a response can be sent back");
     
@@ -304,7 +302,7 @@ class Wrabbity {
     }
 
   // Send a Request to an RPC Server and wait for a Response
-    async taskRequest(executerName, routingKey, request, _requestListener = this._requestListener, replyToQueue = '', channel = this.channel, connection = this.connection, qOptions= {exclusive : false},  ack_options = {noAck : true}) {
+    async taskRequest(executerName, routingKey, request, callback = this.callback, replyToQueue = '', channel = this.channel, connection = this.connection, qOptions= {exclusive : false},  ack_options = {noAck : true}) {
            
         //#region  parameter Description:
         /* 
@@ -322,9 +320,6 @@ class Wrabbity {
        //#endregion
 
         let corr = uuidv4();
-       // console.log(this.isUUID(corr));
-
-        let requestListener = _requestListener;
 
         let ex = executerName + '_tasks';
         
@@ -338,13 +333,13 @@ class Wrabbity {
 
         channel.consume(q.queue, msg => {
 
-            requestListener(msg, corr);
+            callback(msg, corr);
 
         }, ack_options);
     }
 
     // this function will be fired as Event when a Task Client will receive the Response of his Request => define your own function before calling taskRequest and passing this function as an argument
-    _requestListener(msg, corr) {
+    callback(msg, corr) {
              
         //#region  parameter Description:
         /* 
