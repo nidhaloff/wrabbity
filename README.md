@@ -330,13 +330,11 @@ ServerSimulator();
 Design principles
 -----------------
 
-For the sake of simplicity, I gave above examples of how to use each messaging pattern. However, notice how I always created a new function and initialized a connection. You will not do this in production when you work with wrabbity, simply because initializing a connection and channel everytime is expensive and will make performance worse.
+Wrabbity is designed to give you the possibility of organizing your code and avoid writing much boilerplate. Furthermore, using the async/await syntax keeps your code readable and clear. You can know what your code is doing from the first sight ;) 
 
-So keep in mind that these examples is meant to give you an overview of the project, but if you use wrabbity in production, you need to have only one wrabbity object (which hold your connection and channel) and simply reuse it over your project.
+**Example mixing publishing and subscribing**
 
-**How to do that**
-
-Look at this example to know how to integrate all your functionality in one wrapper function and hence, reuse the wrabbity object or rather the initialized connection and channel created by wrabbity:
+This example demonstrates how you can publish and subscribe in the same program. You can also use an rpc client and rpc server in the same program or function. This code aims to prove to you how easy and extendable the library is.
 
 ```javascript
 
