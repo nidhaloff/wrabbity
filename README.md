@@ -1,5 +1,5 @@
 ![npm](https://img.shields.io/npm/v/wrabbity)
-![npm](https://img.shields.io/npm/dw/wrabbity)
+![npm](https://img.shields.io/npm/dm/wrabbity)
 ![NPM](https://img.shields.io/npm/l/wrabbity)
 [![https://twitter.com/NidhalBaccouri](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&style=plastic)]()
   
