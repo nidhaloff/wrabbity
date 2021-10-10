@@ -1,8 +1,7 @@
 
 const amqplib = require('./node_modules/amqplib'); // amqplib is the Bibliothek that implement the AMQP Protocol
 const { v4: uuidv4 } = require('uuid'); // lightweight library to generate a uuid 
-
-
+const debug = require('debug')('wrabbity');
 
 class Wrabbity {
 
@@ -46,7 +45,7 @@ class Wrabbity {
 
         channel.prefetch(1);
 
-        //console.log(' [x] Awaiting RPC requests');
+        //debug(' [x] Awaiting RPC requests');
 
         this.connection = connection; 
   
@@ -74,7 +73,7 @@ class Wrabbity {
 
       this.channel.sendToQueue(queue, Buffer.from(message));
 
-      console.log("msg sent ");
+      debug("msg sent ");
     }
 
     // basic function receiver => this will receive a Message from a queue (there is no exchange middleware) based on queue name. queue options will describe if the queue will be durable, exclusive etc.. it is set to a default value
@@ -115,7 +114,7 @@ class Wrabbity {
 
         await channel.consume(q.queue, msg=> { // consume msg from that exchange according to some Parameters 
         
-            console.log("string msg", msg.content.toString());
+            debug("string msg", msg.content.toString());
 
             channel.sendToQueue(msg.properties.replyTo, Buffer.from(response), {correlationId: msg.properties.correlationId});
                     
@@ -149,13 +148,13 @@ class Wrabbity {
         let q = await channel.assertQueue(replyToQueue, qOptions);
         channel.publish(ex, routingKey, Buffer.from( JSON.stringify(request) ), { correlationId: corr, replyTo: q.queue });
 
-        console.log(' [x] Requesting response for this msg', request);
+        debug(' [x] Requesting response for this msg', request);
 
         channel.consume(q.queue, msg => {
 
             if(msg.properties.correlationId == corr) {
 
-                console.log(' [.] Got %s', msg.content.toString());
+                debug(' [.] Got %s', msg.content.toString());
                setTimeout(function() { connection.close(); process.exit(0) }, 500);
             }
         }, ack_options);
@@ -231,7 +230,7 @@ class Wrabbity {
 
         // do Something when the subscriber receive the message from the Publisher
         // example:
-            console.log("Message %s received from Publisher", msg.content.toString());
+            debug("Message %s received from Publisher", msg.content.toString());
         
     }
 
@@ -279,7 +278,7 @@ class Wrabbity {
     // this function will be fired as Event when a taskExecuter will consume a Request => define your own function before calling taskResponse and passing this function as an argument
     callback(msg, response) {
  
-        console.log("msg received and a response can be sent back");
+        debug("msg received and a response can be sent back");
     
     }
 
@@ -329,7 +328,7 @@ class Wrabbity {
 
         channel.publish(ex, routingKey, Buffer.from( JSON.stringify(request)), { correlationId: corr, replyTo: q.queue });
 
-        console.log(' [x] Requesting response for this msg', request);
+        debug(' [x] Requesting response for this msg', request);
 
         channel.consume(q.queue, msg => {
 
@@ -351,7 +350,7 @@ class Wrabbity {
        
        if(msg.properties.correlationId == corr) {
 
-            console.log(' [.] Got %s success', msg.content.toString());
+            debug(' [.] Got %s success', msg.content.toString());
            //setTimeout(function() { connection.close(); process.exit(0) }, 500);
         }
     }
@@ -371,12 +370,3 @@ class Wrabbity {
 
   
 module.exports = Wrabbity; // Export the Module so that we can use it in other files
-
-
-
-
-
-
-
-
-

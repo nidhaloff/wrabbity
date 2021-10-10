@@ -388,6 +388,11 @@ The encapsulation of the project functionality in one wrapper function gives me 
 
 If you have any further question, you can always contact me on twitter or send me an email ;)
 
+Debug
+---------
+
+The module uses [debug](https://www.npmjs.com/package/debug) module for internal messages. So if you'd like to see full logs - set `DEBUG=*` or `DEBUG=wrabbity`
+
 Examples
 ---------
 
